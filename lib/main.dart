@@ -55,6 +55,15 @@ class _MyHomePageState extends State<MyHomePage> {
         MarkerLayerOptions(
           markers: _pontos,
         ),
+        PolylineLayerOptions(
+            polylineCulling: false,
+            polylines: [
+                Polyline(
+                  points: [LatLng(-8.4121861, -38.9033043), LatLng(-8.5421001,-37.0922099), LatLng(-8.3675989,-37.5671426),],
+                  color: Colors.blue,
+                ),
+            ],
+        ),
       ],
       nonRotatedChildren: [
         AttributionWidget.defaultWidget(
