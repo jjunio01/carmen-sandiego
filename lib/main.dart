@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:latlong2/latlong.dart';
 
 void main() {
@@ -33,7 +34,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Marker> _pontos = [];
+  List<LatLng> _linhas = [];
   double _zomm = 6;
+  final PopupController _popupLayerController = PopupController();
 
   @override
   void initState() {
@@ -46,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       options: MapOptions(
         center: LatLng(-8.4121861, -38.9033043),
         zoom: _zomm,
+        onTap: (_, __) => _popupLayerController.hideAllPopups(),
       ),
       layers: [
         TileLayerOptions(
@@ -56,19 +60,42 @@ class _MyHomePageState extends State<MyHomePage> {
           markers: _pontos,
         ),
         PolylineLayerOptions(
-            polylineCulling: false,
-            polylines: [
-                Polyline(
-                  points: [LatLng(-8.4121861, -38.9033043), LatLng(-8.5421001,-37.0922099), LatLng(-8.3675989,-37.5671426),],
-                  color: Colors.blue,
-                ),
-            ],
+          polylineCulling: false,
+          polylines: [
+            Polyline(
+              points: _linhas,
+              color: Colors.blue,
+            ),
+          ],
         ),
       ],
       nonRotatedChildren: [
         AttributionWidget.defaultWidget(
           source: 'JJunio',
           onSourceTapped: null,
+        ),
+      ],
+      children: [
+        PopupMarkerLayerWidget(
+          options: PopupMarkerLayerOptions(
+            onPopupEvent: (event, selectedMarkers) {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(event.runtimeType.toString()),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+            markerCenterAnimation: const MarkerCenterAnimation(),
+            popupController: _popupLayerController,
+            markers: _pontos,
+            markerRotateAlignment:
+                PopupMarkerLayerOptions.rotationAlignmentFor(AnchorAlign.top),
+            popupBuilder: (BuildContext context, Marker marker) => const Card(
+              child: Text("Texto"),
+            ),
+          ),
         ),
       ],
     );
@@ -97,41 +124,54 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ElevatedButton(
                   onPressed: () {
                     setState(() {
+                      _linhas = [];
                       _pontos.add(
                         Marker(
                           point: LatLng(-8.4121861, -38.9033043),
                           width: 80,
                           height: 80,
                           builder: (context) =>
-                              const Icon(Icons.pin_drop),
+                              const Icon(Icons.pin_drop, color: Colors.black),
                         ),
+                      );
+                      _linhas.add(
+                        LatLng(-8.4121861, -38.9033043),
                       );
                       _pontos.add(
                         Marker(
-                          point: LatLng(-8.5421001,-37.0922099),
+                          point: LatLng(-8.5421001, -37.0922099),
                           width: 80,
                           height: 80,
-                          builder: (context) =>
-                              const Icon(Icons.pin_drop),
+                          builder: (context) => const Icon(Icons.pin_drop,
+                              color: Colors.redAccent),
                         ),
+                      );
+                      _linhas.add(
+                        LatLng(-8.5421001, -37.0922099),
                       );
                       _pontos.add(
                         Marker(
-                          point: LatLng(-8.3675989,-37.5671426),
+                          point: LatLng(-8.3675989, -37.5671426),
                           width: 80,
                           height: 80,
-                          builder: (context) =>
-                              const Icon(Icons.pin_drop),
+                          builder: (context) => const Icon(Icons.pin_drop,
+                              color: Colors.greenAccent),
                         ),
+                      );
+                      _linhas.add(
+                        LatLng(-8.3675989, -37.5671426),
                       );
                       _pontos.add(
                         Marker(
-                          point: LatLng(-8.3141311,-38.0768195),
+                          point: LatLng(-8.3141311, -38.0768195),
                           width: 80,
                           height: 80,
-                          builder: (context) =>
-                              const Icon(Icons.pin_drop),
+                          builder: (context) => const Icon(Icons.pin_drop,
+                              color: Colors.blueAccent),
                         ),
+                      );
+                      _linhas.add(
+                        LatLng(-8.3141311, -38.0768195),
                       );
                       _zomm = 10.0;
                       _exiberMapa(_pontos, _zomm);
